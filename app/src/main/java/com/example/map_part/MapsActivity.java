@@ -75,10 +75,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ArrayList<MarkerItem> sampleList = new ArrayList();
 
 
-        sampleList.add(new MarkerItem(37.538523, 126.96568, "마음병원","02-970-4456"));
-        sampleList.add(new MarkerItem(37.527523, 126.96568, "아리랑병원","02-350-9316"));
-        sampleList.add(new MarkerItem(37.549523, 126.96568, "사랑병원","02-631-8553"));
-        sampleList.add(new MarkerItem(37.538523, 126.95768, "주작병원","02-766-3543"));
+        sampleList.add(new MarkerItem(37.538523, 126.96568, "A Bệnh viện","02-970-4456"));
+        sampleList.add(new MarkerItem(37.527523, 126.96568, "B Bệnh viện","02-350-9316"));
+        sampleList.add(new MarkerItem(37.549523, 126.96568, "C Bệnh viện","02-631-8553"));
+        sampleList.add(new MarkerItem(37.538523, 126.95768, "D Bệnh viện","02-766-3543"));
 
 
         for (MarkerItem markerItem : sampleList) {
