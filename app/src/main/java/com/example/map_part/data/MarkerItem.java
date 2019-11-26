@@ -1,4 +1,4 @@
-package com.example.map_part;
+package com.example.map_part.data;
 
 public class MarkerItem {
     double lat;
