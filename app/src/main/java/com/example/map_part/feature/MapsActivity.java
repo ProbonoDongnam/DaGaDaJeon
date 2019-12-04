@@ -307,10 +307,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         new NRPlaces.Builder()
                 .listener(MapsActivity.this)
-                .key("AIzaSyBv4qT-F6wEaPKQOIixIY9u_jSeKvPK2b4")
+                .key("AIzaSyBmTL-YSshGXcxj65kev-rBpoU4sdNPV0M")
                 .latlng(location.latitude, location.longitude)//현재 위치
                 .radius(500) //500 미터 내에서 검색
-                .type(PlaceType.HOSPITAL)
+                .type(PlaceType.RESTAURANT)
                 .build()
                 .execute();
     }
@@ -526,7 +526,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         } else {
             Address address = addresses.get(0);
-            return address.getAddressLine(0).toString();
+            return address.getAddressLine(0);
         }
 
     }
