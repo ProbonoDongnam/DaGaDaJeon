@@ -307,7 +307,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         new NRPlaces.Builder()
                 .listener(MapsActivity.this)
-                .key("AIzaSyBmTL-YSshGXcxj65kev-rBpoU4sdNPV0M")
+                .key("AIzaSyCaPytgHWskZoxsJ9od6tq0916Ug4QT0-A")
                 .latlng(location.latitude, location.longitude)//현재 위치
                 .radius(500) //500 미터 내에서 검색
                 .type(PlaceType.RESTAURANT)
