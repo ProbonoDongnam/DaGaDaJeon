@@ -133,17 +133,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-
+    //샘플 마커를 만들어주는 메소드
     private void getSampleMarkerItems() {
         ArrayList<MarkerItem> sampleList = new ArrayList();
 
@@ -160,14 +150,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    //커스텀 마커 모양 inflate
     private void setCustomMarkerView() {
-
         marker_root_view = LayoutInflater.from(this).inflate(R.layout.custom_marker, null);
         tv_marker = (TextView) marker_root_view.findViewById(R.id.tv_marker);
     }
 
+    //커스텀 마커를 추가하는 메소드.
     private Marker addMarker(MarkerItem markerItem, boolean isSelectedMarker) {
-
 
         LatLng position = new LatLng(markerItem.getLat(), markerItem.getLon());
         String name = markerItem.getName();
@@ -176,6 +166,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         tv_marker.setText(name);
 
+        //마커가 선택 되었을 때 색깔을 바꿔주는 분기
         if (isSelectedMarker) {
             tv_marker.setBackgroundResource(R.drawable.ic_marker_phone_blue);
             tv_marker.setTextColor(Color.WHITE);
@@ -189,7 +180,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         markerOptions.position(position);
         markerOptions.snippet(call);
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(this, marker_root_view)));
-
 
         return mMap.addMarker(markerOptions);
 
