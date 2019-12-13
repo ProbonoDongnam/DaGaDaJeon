@@ -130,6 +130,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 showPlaceInformation(currentPosition);
+                Log.e("sdsdsd","xxxxx");
             }
         });
     }
@@ -265,28 +266,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                ArrayList<MarkerItem> sampleList = new ArrayList();
+
                 for (noman.googleplaces.Place place : places) {
 
                     LatLng latLng
                             = new LatLng(place.getLatitude()
                             , place.getLongitude());
 
+
+
+                    sampleList.add(new MarkerItem(place.getLatitude(), place.getLongitude(), place.getName(), place.getVicinity()));
+
+
+
                     String markerSnippet = getCurrentAddress(latLng);
 
-                    MarkerOptions markerOptions = new MarkerOptions();
-                    markerOptions.position(latLng);
-                    markerOptions.title(place.getName());
-                    markerOptions.snippet(markerSnippet);
-                    Marker item = mMap.addMarker(markerOptions);
-                    previous_marker.add(item);
+//                    MarkerOptions markerOptions = new MarkerOptions();
+//                    markerOptions.position(latLng);
+//                    markerOptions.title(place.getName());
+//                    markerOptions.snippet(markerSnippet);
+//                    Marker item = mMap.addMarker(markerOptions);
+//                    previous_marker.add(item);
 
                 }
 
+
                 //중복 마커 제거
-                HashSet<Marker> hashSet = new HashSet<Marker>();
-                hashSet.addAll(previous_marker);
-                previous_marker.clear();
-                previous_marker.addAll(hashSet);
+                HashSet<MarkerItem> hashSet = new HashSet<MarkerItem>();
+                hashSet.addAll(sampleList);
+                for (MarkerItem markerItem : sampleList) {
+                    addMarker(markerItem, false);
+                }
+//                //중복 마커 제거
+//                HashSet<Marker> hashSet = new HashSet<Marker>();
+//                hashSet.addAll(previous_marker);
+//                previous_marker.clear();
+//                previous_marker.addAll(hashSet);
 
             }
         });
@@ -308,9 +324,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .key("AIzaSyCaPytgHWskZoxsJ9od6tq0916Ug4QT0-A")
                 .latlng(location.latitude, location.longitude)//현재 위치
                 .radius(500) //500 미터 내에서 검색
-                .type(PlaceType.RESTAURANT)
-                .build()
-                .execute();
+                .type(PlaceType.RESTAURANT).build().execute();
     }
 
     @Override
