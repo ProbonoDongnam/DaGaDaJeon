@@ -26,6 +26,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,6 +52,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -68,6 +70,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Marker selectedMarker;
     View marker_root_view;
     TextView tv_marker, placeName, placeCall;
+    EditText search_keyword;
     ImageView placeImg;
     List<Marker> previous_marker = null;
 
@@ -124,6 +127,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         placeName = findViewById(R.id.placeName);
         placeCall = findViewById(R.id.placeCall);
         placeImg = findViewById(R.id.placeImg);
+        search_keyword = findViewById(R.id.search_keyword);
 
         previous_marker = new ArrayList<Marker>();
 
@@ -141,10 +145,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ArrayList<MarkerItem> sampleList = new ArrayList();
 
 
-        sampleList.add(new MarkerItem(37.538523, 126.96568, "sds","A Bệnh viện", "02-970-4456"));
-        sampleList.add(new MarkerItem(37.527523, 126.96568,"sd" ,"B Bệnh viện", "02-350-9316"));
-        sampleList.add(new MarkerItem(37.549523, 126.96568,"s", "C Bệnh viện", "02-631-8553"));
-        sampleList.add(new MarkerItem(37.538523, 126.95768,"s", "D Bệnh viện", "02-766-3543"));
+        sampleList.add(new MarkerItem(37.538523, 126.96568, "sds", "A Bệnh viện", "02-970-4456"));
+        sampleList.add(new MarkerItem(37.527523, 126.96568, "sd", "B Bệnh viện", "02-350-9316"));
+        sampleList.add(new MarkerItem(37.549523, 126.96568, "s", "C Bệnh viện", "02-631-8553"));
+        sampleList.add(new MarkerItem(37.538523, 126.95768, "s", "D Bệnh viện", "02-766-3543"));
 
 
         for (MarkerItem markerItem : sampleList) {
@@ -212,7 +216,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         double lon = marker.getPosition().longitude;
         String name = marker.getTitle();
         String Img = marker.getSnippet();
-        MarkerItem temp = new MarkerItem(lat, lon,Img, name, "010-5112-1827");
+        MarkerItem temp = new MarkerItem(lat, lon, Img, name, "010-5112-1827");
         return addMarker(temp, isSelectedMarker);
 
     }
@@ -250,7 +254,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //맵을 클릭하면 실행하는 함수가 아닌듯??
     @Override
     public void onMapClick(LatLng latLng) {
-        changeSelectedMarker(null);
     }
 
     @Override
@@ -277,9 +280,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             , place.getLongitude());
 
 
-
-                    sampleList.add(new MarkerItem(place.getLatitude(), place.getLongitude(),place.getIcon(), place.getName(), place.getVicinity()));
-
+                    sampleList.add(new MarkerItem(place.getLatitude(), place.getLongitude(), place.getIcon(), place.getName(), place.getVicinity()));
 
 
                     String markerSnippet = getCurrentAddress(latLng);
@@ -321,13 +322,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (previous_marker != null)
             previous_marker.clear();//지역정보 마커 클리어
 
-        new NRPlaces.Builder()
-                .listener(MapsActivity.this)
-                .key("AIzaSyCaPytgHWskZoxsJ9od6tq0916Ug4QT0-A")
-                .latlng(location.latitude, location.longitude)//현재 위치
-                .radius(500) //500 미터 내에서 검색
-                .type(PlaceType.RESTAURANT).build()
-                .execute();
+        if(search_keyword.getText().toString().equalsIgnoreCase("")){
+            Toast.makeText(this, "검색어를 입력하세요!", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            new NRPlaces.Builder()
+                    .listener(MapsActivity.this)
+                    .key("AIzaSyCaPytgHWskZoxsJ9od6tq0916Ug4QT0-A")
+                    .latlng(location.latitude, location.longitude)//현재 위치
+                    .radius(500) //500 미터 내에서 검색
+                    .type(search_keyword.getText().toString()).build()
+                    .execute();
+        }
     }
 
     @Override
@@ -398,7 +404,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onMapClick(LatLng latLng) {
 
-                Log.d(TAG, "onMapClick :");
+                Log.d(TAG, "onMapClick :" + selectedMarker+search_keyword.getText().toString());
                 if (selectedMarker != null) {
                     addMarker(selectedMarker, false);
                     selectedMarker.remove();
