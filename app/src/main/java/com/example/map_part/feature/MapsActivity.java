@@ -30,6 +30,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.map_part.R;
 import com.example.map_part.data.MarkerItem;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -67,6 +68,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Marker selectedMarker;
     View marker_root_view;
     TextView tv_marker, placeName, placeCall;
+    ImageView placeImg;
     List<Marker> previous_marker = null;
 
     private Marker currentMarker = null;
@@ -75,7 +77,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int UPDATE_INTERVAL_MS = 1000;  // 1초
     private static final int FASTEST_UPDATE_INTERVAL_MS = 500; // 0.5초
-
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     boolean needRequest = false;
 
@@ -122,6 +123,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         placeName = findViewById(R.id.placeName);
         placeCall = findViewById(R.id.placeCall);
+        placeImg = findViewById(R.id.placeImg);
 
         previous_marker = new ArrayList<Marker>();
 
@@ -130,7 +132,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 showPlaceInformation(currentPosition);
-                Log.e("sdsdsd","xxxxx");
             }
         });
     }
@@ -140,10 +141,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ArrayList<MarkerItem> sampleList = new ArrayList();
 
 
-        sampleList.add(new MarkerItem(37.538523, 126.96568, "A Bệnh viện", "02-970-4456"));
-        sampleList.add(new MarkerItem(37.527523, 126.96568, "B Bệnh viện", "02-350-9316"));
-        sampleList.add(new MarkerItem(37.549523, 126.96568, "C Bệnh viện", "02-631-8553"));
-        sampleList.add(new MarkerItem(37.538523, 126.95768, "D Bệnh viện", "02-766-3543"));
+        sampleList.add(new MarkerItem(37.538523, 126.96568, "sds","A Bệnh viện", "02-970-4456"));
+        sampleList.add(new MarkerItem(37.527523, 126.96568,"sd" ,"B Bệnh viện", "02-350-9316"));
+        sampleList.add(new MarkerItem(37.549523, 126.96568,"s", "C Bệnh viện", "02-631-8553"));
+        sampleList.add(new MarkerItem(37.538523, 126.95768,"s", "D Bệnh viện", "02-766-3543"));
 
 
         for (MarkerItem markerItem : sampleList) {
@@ -179,10 +180,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //마커가 클릭 됐을 때
     @Override
     public boolean onMarkerClick(Marker marker) {
-
         CameraUpdate center = CameraUpdateFactory.newLatLng(marker.getPosition());
         placeName.setText(marker.getTitle());
         placeCall.setText(marker.getSnippet());
+        Glide.with(this).load(marker.getSnippet()).into(placeImg);
         mMap.animateCamera(center);
         changeSelectedMarker(marker);
         return true;
@@ -210,8 +211,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         double lat = marker.getPosition().latitude;
         double lon = marker.getPosition().longitude;
         String name = marker.getTitle();
-        String call = marker.getSnippet();
-        MarkerItem temp = new MarkerItem(lat, lon, name, call);
+        String Img = marker.getSnippet();
+        MarkerItem temp = new MarkerItem(lat, lon,Img, name, "010-5112-1827");
         return addMarker(temp, isSelectedMarker);
 
     }
@@ -222,6 +223,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng position = new LatLng(markerItem.getLat(), markerItem.getLon());
         String name = markerItem.getName();
         String call = markerItem.getCall();
+        String Img = markerItem.getImg();
 //        String formatted = NumberFormat.getCurrencyInstance().format((name));
 
         tv_marker.setText(name);
@@ -238,7 +240,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.title(name);
         markerOptions.position(position);
-        markerOptions.snippet(call);
+        markerOptions.snippet(Img);
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(this, marker_root_view)));
 
         return mMap.addMarker(markerOptions);
@@ -276,7 +278,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-                    sampleList.add(new MarkerItem(place.getLatitude(), place.getLongitude(), place.getName(), place.getVicinity()));
+                    sampleList.add(new MarkerItem(place.getLatitude(), place.getLongitude(),place.getIcon(), place.getName(), place.getVicinity()));
 
 
 
@@ -324,7 +326,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .key("AIzaSyCaPytgHWskZoxsJ9od6tq0916Ug4QT0-A")
                 .latlng(location.latitude, location.longitude)//현재 위치
                 .radius(500) //500 미터 내에서 검색
-                .type(PlaceType.RESTAURANT).build().execute();
+                .type(PlaceType.RESTAURANT).build()
+                .execute();
     }
 
     @Override
@@ -335,7 +338,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerClickListener(this);
         mMap.setOnMapClickListener(this);
         setCustomMarkerView();
-        getSampleMarkerItems();
+//        getSampleMarkerItems();
         //런타임 퍼미션 요청 대화상자나 GPS 활성 요청 대화상자 보이기전에
         //지도의 초기위치를 서울로 이동
         setDefaultLocation();
@@ -396,6 +399,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onMapClick(LatLng latLng) {
 
                 Log.d(TAG, "onMapClick :");
+                if (selectedMarker != null) {
+                    addMarker(selectedMarker, false);
+                    selectedMarker.remove();
+                }
             }
         });
     }
@@ -583,7 +590,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         markerOptions.title(markerTitle);
         markerOptions.snippet(markerSnippet);
         markerOptions.draggable(true);
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
         currentMarker = mMap.addMarker(markerOptions);
 
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 15);
