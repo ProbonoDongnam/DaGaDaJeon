@@ -3,12 +3,14 @@ package com.example.map_part.data;
 public class MarkerItem {
     double lat;
     double lon;
+    String Img;
     String name;
     String call;
 
-    public MarkerItem(double lat,double lon,String name,String call) {
+    public MarkerItem(double lat,double lon,String Img,String name,String call) {
         this.lat = lat;
         this.lon = lon;
+        this.Img = Img;
         this.name = name;
         this.call = call;
     }
@@ -19,6 +21,10 @@ public class MarkerItem {
 
     public double getLon() {
         return lon;
+    }
+
+    public String getImg() {
+        return Img;
     }
 
     public String getName() {
@@ -35,6 +41,10 @@ public class MarkerItem {
 
     public void setLon(double lon) {
         this.lon = lon;
+    }
+
+    public void setImg(String img) {
+        Img = img;
     }
 
     public void setName(String name) {
