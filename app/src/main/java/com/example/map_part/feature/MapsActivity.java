@@ -1,6 +1,7 @@
 package com.example.map_part.feature;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -19,17 +20,32 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
+import android.speech.RecognizerIntent;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.speech.RecognizerIntent;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.map_part.R;
@@ -50,13 +66,24 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import noman.googleplaces.NRPlaces;
 import noman.googleplaces.Place;
@@ -64,7 +91,7 @@ import noman.googleplaces.PlaceType;
 import noman.googleplaces.PlacesException;
 import noman.googleplaces.PlacesListener;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener, PlacesListener {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener, PlacesListener {
 
     private GoogleMap mMap;
     Marker selectedMarker;
@@ -73,6 +100,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     EditText search_keyword;
     ImageView placeImg;
     List<Marker> previous_marker = null;
+    String language = "ko";
 
     private Marker currentMarker = null;
 
@@ -138,6 +166,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 showPlaceInformation(currentPosition);
             }
         });
+    }
+
+    //speech_input 버튼 클릭
+    public void onClickSpeechInput(View v){
+        //speech_input 버튼 클릭
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, language);
+        Log.i("language_log",language);
+        startActivityForResult(intent, 1);
+    }
+
+    //language 버튼 클릭
+    public void onClickLanguage(View v){
+        Intent intent = new Intent(MapsActivity.this, SettingActivity.class);
+        startActivityForResult(intent, 2);
     }
 
     //샘플 마커를 만들어주는 메소드
@@ -716,10 +760,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         builder.create().show();
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+
+
+        if(resultCode == RESULT_OK && (requestCode == 1)){
+            ArrayList<String> sstResult = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+
+            String result_sst = sstResult.get(0);
+
+            new MapsActivity.GoogleTranslatorTask().execute(result_sst);
+
+            //tv.setText(""+result_sst);
+        }
+
+        if(resultCode == RESULT_OK && (requestCode == 2)){
+            String source_language = data.getStringExtra("source_language");
+            language = source_language;
+
+        }
 
         switch (requestCode) {
 
@@ -741,5 +802,75 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
         }
     }
+
+    //TTS METHOD
+    // 번역 AsyncTask
+    class GoogleTranslatorTask extends AsyncTask<String, Integer, String> {
+        String URL = "https://www.googleapis.com/language/translate/v2?key=";
+        String KEY = "AIzaSyAgJVUHXYJYOhctVpZgUUImw6tpbvJqs3M";
+        String TARGET = "&target=en";
+        String SOURCE = "&source=" + language;
+        String QUERY = "&q=";
+
+        String englishString = "";
+        String koreaString;
+
+        @Override
+        protected String doInBackground(String... editText) {
+            englishString = editText[0];
+            StringBuilder result = new StringBuilder();
+            try{
+                String encodedText = URLEncoder.encode(englishString, "UTF-8");
+                java.net.URL url = new URL(URL+ KEY + SOURCE + TARGET + QUERY + encodedText);
+                HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+                InputStream stream;
+                if(conn.getResponseCode() == 200){
+                    stream = conn.getInputStream();
+                }else{
+                    stream = conn.getErrorStream();
+                }
+                BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+                String line;
+
+                while((line = reader.readLine()) != null){
+                    result.append(line);
+                }
+
+                JsonParser parser = new JsonParser();
+
+                JsonElement element = parser.parse(result.toString());
+
+                if(element.isJsonObject()){
+                    JsonObject obj = element.getAsJsonObject();
+                    if(obj.get("error") == null){
+                        koreaString = obj.get("data").getAsJsonObject().get("translations").getAsJsonArray().get(0).getAsJsonObject().get("translatedText").getAsString();
+                    }
+                }
+                if(conn.getResponseCode() != 200){
+                    Log.e("GoogleTranslatorTask", result.toString());
+                }
+            }catch(IOException | JsonSyntaxException ex){
+                Log.e("GoogleTranslatorTask", ex.getMessage());
+            }
+            return koreaString;
+        }
+
+        @Override
+        protected void onPreExecute() { super.onPreExecute(); }
+
+        @Override
+        protected void onProgressUpdate(Integer ...progress) { // 파일 다운로드 퍼센티지 표시 작업
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            search_keyword.setText(result);
+        }
+
+
+    }
+
+
 }
 

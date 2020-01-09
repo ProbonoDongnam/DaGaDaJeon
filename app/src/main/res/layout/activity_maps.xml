@@ -42,11 +42,25 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
+                android:id="@+id/speech_input"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onClickSpeechInput"
+                android:src="@drawable/search_ic"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/language"
+                app:layout_constraintHorizontal_bias="0.051"
+                app:layout_constraintStart_toEndOf="@+id/back_btn"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.51" />
+
+            <ImageView
                 android:id="@+id/language"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
                 android:layout_marginEnd="63dp"
+                android:onClick="onClickLanguage"
                 android:src="@drawable/btn_eng"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -82,7 +96,6 @@
                 android:id="@+id/search_keyword"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="51dp"
                 android:background="@null"
                 android:hint="Nói những gì bạn muốn"
                 android:lineHeight="16sp"
@@ -90,18 +103,23 @@
                 android:textColorHint="#707070"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.156"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.52" />
 
             <ImageView
                 android:id="@+id/search_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="18dp"
                 android:src="@drawable/search_ic"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.894"
+                app:layout_constraintStart_toEndOf="@+id/search_keyword"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.521" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -112,7 +130,9 @@
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/top_constraintLayout"
-            tools:context=".feature.MapsActivity" />
+            app:layout_constraintVertical_bias="1.0"
+            tools:context=".feature.MapsActivity"
+            tools:layout_editor_absoluteX="0dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
