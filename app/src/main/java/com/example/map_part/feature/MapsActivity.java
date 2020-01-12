@@ -420,21 +420,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void showPlaceInformation(LatLng location) {
         mMap.clear();//지도 클리어
-
+        getSampleMarkerItems();
         if (previous_marker != null)
             previous_marker.clear();//지역정보 마커 클리어
 
-        if (search_keyword.getText().toString().equalsIgnoreCase("")) {
-            Toast.makeText(this, "검색어를 입력하세요!", Toast.LENGTH_SHORT).show();
-        } else {
-            new NRPlaces.Builder()
-                    .listener(MapsActivity.this)
-                    .key("AIzaSyCaPytgHWskZoxsJ9od6tq0916Ug4QT0-A")
-                    .latlng(location.latitude, location.longitude)//현재 위치
-                    .radius(500) //500 미터 내에서 검색
-                    .type(search_keyword.getText().toString()).build()
-                    .execute();
-        }
+//        if (search_keyword.getText().toString().equalsIgnoreCase("")) {
+//            Toast.makeText(this, "검색어를 입력하세요!", Toast.LENGTH_SHORT).show();
+//        } else {
+//            new NRPlaces.Builder()
+//                    .listener(MapsActivity.this)
+//                    .key("AIzaSyCaPytgHWskZoxsJ9od6tq0916Ug4QT0-A")
+//                    .latlng(location.latitude, location.longitude)//현재 위치
+//                    .radius(500) //500 미터 내에서 검색
+//                    .type(search_keyword.getText().toString()).build()
+//                    .execute();
+//        }
     }
 
     @Override
@@ -445,7 +445,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnMarkerClickListener(this);
         mMap.setOnMapClickListener(this);
         setCustomMarkerView();
-        getSampleMarkerItems();
+//        getSampleMarkerItems();
         //런타임 퍼미션 요청 대화상자나 GPS 활성 요청 대화상자 보이기전에
         //지도의 초기위치를 서울로 이동
         setDefaultLocation();
