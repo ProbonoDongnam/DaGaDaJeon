@@ -247,10 +247,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         ArrayList<MarkerItem> sampleList = new ArrayList();
 
 
-        sampleList.add(new MarkerItem(37.538523, 126.96568, "sds", "A Bệnh viện", "02-970-4456"));
-        sampleList.add(new MarkerItem(37.527523, 126.96568, "sd", "B Bệnh viện", "02-350-9316"));
-        sampleList.add(new MarkerItem(37.529523, 126.96568, "s", "C Bệnh viện", "02-631-8553"));
-        sampleList.add(new MarkerItem(37.538523, 126.95768, "s", "D Bệnh viện", "02-766-3543"));
+        sampleList.add(new MarkerItem(37.4903686, 126.81095, "sds", "A Bệnh viện", "02-970-4456"));
+        sampleList.add(new MarkerItem(37.4793686,126.81095, "sd", "B Bệnh viện", "02-350-9316"));
+        sampleList.add(new MarkerItem(37.4813686,126.81095, "s", "C Bệnh viện", "02-631-8553"));
+        sampleList.add(new MarkerItem(37.4903686,126.80295, "s", "D Bệnh viện", "02-766-3543"));
 
 
         for (MarkerItem markerItem : sampleList) {
