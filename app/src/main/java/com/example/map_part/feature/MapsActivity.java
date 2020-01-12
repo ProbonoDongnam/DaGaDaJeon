@@ -191,7 +191,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         sampleList.add(new MarkerItem(37.538523, 126.96568, "sds", "A Bệnh viện", "02-970-4456"));
         sampleList.add(new MarkerItem(37.527523, 126.96568, "sd", "B Bệnh viện", "02-350-9316"));
-        sampleList.add(new MarkerItem(37.549523, 126.96568, "s", "C Bệnh viện", "02-631-8553"));
+        sampleList.add(new MarkerItem(37.529523, 126.96568, "s", "C Bệnh viện", "02-631-8553"));
         sampleList.add(new MarkerItem(37.538523, 126.95768, "s", "D Bệnh viện", "02-766-3543"));
 
 
@@ -231,7 +231,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         CameraUpdate center = CameraUpdateFactory.newLatLng(marker.getPosition());
         placeName.setText(marker.getTitle());
         placeCall.setText(marker.getSnippet());
-        Glide.with(this).load(marker.getSnippet()).into(placeImg);
+        Glide.with(this).load(R.drawable.hospital).into(placeImg);
         mMap.animateCamera(center);
         changeSelectedMarker(marker);
         return true;
@@ -288,7 +288,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.title(name);
         markerOptions.position(position);
-        markerOptions.snippet(Img);
+        markerOptions.snippet(call);
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(this, marker_root_view)));
 
         return mMap.addMarker(markerOptions);
@@ -388,7 +388,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnMarkerClickListener(this);
         mMap.setOnMapClickListener(this);
         setCustomMarkerView();
-//        getSampleMarkerItems();
+        getSampleMarkerItems();
         //런타임 퍼미션 요청 대화상자나 GPS 활성 요청 대화상자 보이기전에
         //지도의 초기위치를 서울로 이동
         setDefaultLocation();
