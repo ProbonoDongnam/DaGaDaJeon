@@ -1,11 +1,5 @@
 package com.example.map_part.feature;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -20,7 +14,9 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.speech.RecognizerIntent;
@@ -29,23 +25,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.speech.RecognizerIntent;
-import android.app.Activity;
-import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.example.map_part.R;
@@ -75,7 +63,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -87,7 +74,6 @@ import javax.net.ssl.HttpsURLConnection;
 
 import noman.googleplaces.NRPlaces;
 import noman.googleplaces.Place;
-import noman.googleplaces.PlaceType;
 import noman.googleplaces.PlacesException;
 import noman.googleplaces.PlacesListener;
 
@@ -158,6 +144,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         search_keyword = findViewById(R.id.search_keyword);
 
         previous_marker = new ArrayList<Marker>();
+        callClick();
 
         ImageView button = findViewById(R.id.search_image);
         button.setOnClickListener(new View.OnClickListener() {
@@ -168,18 +155,89 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    private void callClick() {
+        placeImg.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Toast.makeText(MapsActivity.this, placeCall.getText().toString(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                placeCall.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        /* 사용자의 OS 버전이 마시멜로우 이상인지 체크한다. */
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                            /* 사용자 단말기의 권한 중 "전화걸기" 권한이 허용되어 있는지 체크한다.
+                             */
+                            int permissionResult = checkSelfPermission(Manifest.permission.CALL_PHONE);
+
+                            /* CALL_PHONE의 권한이 없을 때 */
+                            // 패키지는 안드로이드 어플리케이션의 아이디다.( 어플리케이션 구분자 )
+                            if (permissionResult == PackageManager.PERMISSION_DENIED) {
+
+                                /* 사용자가 CALL_PHONE 권한을 한번이라도 거부한 적이 있는 지 조사한다.
+                                 * 거부한 이력이 한번이라도 있다면, true를 리턴한다.
+                                 */
+                                if (shouldShowRequestPermissionRationale(Manifest.permission.CALL_PHONE)) {
+                                    AlertDialog.Builder dialog = new AlertDialog.Builder(MapsActivity.this);
+
+                                    dialog.setTitle("권한이 필요합니다.")
+                                            .setMessage("이 기능을 사용하기 위해서는 단말기의 \"전화걸기\" 권한이 필요합니다. 계속하시겠습니까?")
+                                            .setPositiveButton("네", new DialogInterface.OnClickListener() {
+
+                                                @Override
+
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                                        requestPermissions(new String[]{Manifest.permission.CALL_PHONE}, 1000);
+                                                    }
+                                                }
+                                            })
+                                            .setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    Toast.makeText(MapsActivity.this, "기능을 취소했습니다.", Toast.LENGTH_SHORT).show();
+                                                }
+                                            })
+                                            .create()
+                                            .show();
+                                }
+                                //최초로 권한을 요청할 때
+                                else {
+                                    // CALL_PHONE 권한을 Android OS 에 요청한다.
+                                    requestPermissions(new String[]{Manifest.permission.CALL_PHONE}, 1000);
+                                }
+                            }
+
+                            /* CALL_PHONE의 권한이 있을 때 */
+                            else {
+                                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:010-1111-2222"));
+                                startActivity(intent);
+                            }
+                        }
+                        /* 사용자의 OS 버전이 마시멜로우 이하일 떄 */
+                        else {
+                            Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:010-1111-2222"));
+                            startActivity(intent);
+                        }
+                    }
+                });
+    }
+
     //speech_input 버튼 클릭
-    public void onClickSpeechInput(View v){
+    public void onClickSpeechInput(View v) {
         //speech_input 버튼 클릭
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, language);
-        Log.i("language_log",language);
+        Log.i("language_log", language);
         startActivityForResult(intent, 1);
     }
 
     //language 버튼 클릭
-    public void onClickLanguage(View v){
+    public void onClickLanguage(View v) {
         Intent intent = new Intent(MapsActivity.this, SettingActivity.class);
         startActivityForResult(intent, 2);
     }
@@ -366,10 +424,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (previous_marker != null)
             previous_marker.clear();//지역정보 마커 클리어
 
-        if(search_keyword.getText().toString().equalsIgnoreCase("")){
+        if (search_keyword.getText().toString().equalsIgnoreCase("")) {
             Toast.makeText(this, "검색어를 입력하세요!", Toast.LENGTH_SHORT).show();
-        }
-        else {
+        } else {
             new NRPlaces.Builder()
                     .listener(MapsActivity.this)
                     .key("AIzaSyCaPytgHWskZoxsJ9od6tq0916Ug4QT0-A")
@@ -448,7 +505,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onMapClick(LatLng latLng) {
 
-                Log.d(TAG, "onMapClick :" + selectedMarker+search_keyword.getText().toString());
+                Log.d(TAG, "onMapClick :" + selectedMarker + search_keyword.getText().toString());
                 if (selectedMarker != null) {
                     addMarker(selectedMarker, false);
                     selectedMarker.remove();
@@ -676,6 +733,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                            @NonNull String[] permissions,
                                            @NonNull int[] grandResults) {
 
+        if (permsRequestCode == 1000) {
+            /* 요청한 권한을 사용자가 "허용"했다면 인텐트를 띄워라
+                내가 요청한 게 하나밖에 없기 때문에. 원래 같으면 for문을 돈다.*/
+            if (grandResults.length > 0 && grandResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(String.format(placeCall.getText().toString())));
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                    startActivity(intent);
+                }
+            } else {
+                Toast.makeText(MapsActivity.this, "권한 요청을 거부했습니다.", Toast.LENGTH_SHORT).show();
+            }
+        }
+
         if (permsRequestCode == PERMISSIONS_REQUEST_CODE && grandResults.length == REQUIRED_PERMISSIONS.length) {
 
             // 요청 코드가 PERMISSIONS_REQUEST_CODE 이고, 요청한 퍼미션 개수만큼 수신되었다면
@@ -765,8 +835,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onActivityResult(requestCode, resultCode, data);
 
 
-
-        if(resultCode == RESULT_OK && (requestCode == 1)){
+        if (resultCode == RESULT_OK && (requestCode == 1)) {
             ArrayList<String> sstResult = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 
             String result_sst = sstResult.get(0);
@@ -776,7 +845,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             //tv.setText(""+result_sst);
         }
 
-        if(resultCode == RESULT_OK && (requestCode == 2)){
+        if (resultCode == RESULT_OK && (requestCode == 2)) {
             String source_language = data.getStringExtra("source_language");
             language = source_language;
 
@@ -819,20 +888,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         protected String doInBackground(String... editText) {
             englishString = editText[0];
             StringBuilder result = new StringBuilder();
-            try{
+            try {
                 String encodedText = URLEncoder.encode(englishString, "UTF-8");
-                java.net.URL url = new URL(URL+ KEY + SOURCE + TARGET + QUERY + encodedText);
+                java.net.URL url = new URL(URL + KEY + SOURCE + TARGET + QUERY + encodedText);
                 HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
                 InputStream stream;
-                if(conn.getResponseCode() == 200){
+                if (conn.getResponseCode() == 200) {
                     stream = conn.getInputStream();
-                }else{
+                } else {
                     stream = conn.getErrorStream();
                 }
                 BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
                 String line;
 
-                while((line = reader.readLine()) != null){
+                while ((line = reader.readLine()) != null) {
                     result.append(line);
                 }
 
@@ -840,26 +909,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 JsonElement element = parser.parse(result.toString());
 
-                if(element.isJsonObject()){
+                if (element.isJsonObject()) {
                     JsonObject obj = element.getAsJsonObject();
-                    if(obj.get("error") == null){
+                    if (obj.get("error") == null) {
                         koreaString = obj.get("data").getAsJsonObject().get("translations").getAsJsonArray().get(0).getAsJsonObject().get("translatedText").getAsString();
                     }
                 }
-                if(conn.getResponseCode() != 200){
+                if (conn.getResponseCode() != 200) {
                     Log.e("GoogleTranslatorTask", result.toString());
                 }
-            }catch(IOException | JsonSyntaxException ex){
+            } catch (IOException | JsonSyntaxException ex) {
                 Log.e("GoogleTranslatorTask", ex.getMessage());
             }
             return koreaString;
         }
 
         @Override
-        protected void onPreExecute() { super.onPreExecute(); }
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
 
         @Override
-        protected void onProgressUpdate(Integer ...progress) { // 파일 다운로드 퍼센티지 표시 작업
+        protected void onProgressUpdate(Integer... progress) { // 파일 다운로드 퍼센티지 표시 작업
 
         }
 
